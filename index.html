@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Secret Santa</title>
+<style>
+  :root { --bg: #0f3b2e; --card: #fffaf0; --ink: #222; --accent: #c0392b; }
+  * { box-sizing: border-box; }
+  body { margin: 0; min-height: 100vh; display: grid; place-items: center; padding: 16px;
+         background: var(--bg); color: var(--ink); font: 18px/1.5 system-ui, sans-serif; }
+  main { background: var(--card); border-radius: 16px; padding: 32px 24px; max-width: 420px;
+         width: 100%; text-align: center; box-shadow: 0 8px 30px rgba(0,0,0,.3); }
+  h1 { margin: 0 0 8px; font-size: 28px; }
+  .match { font-size: 36px; font-weight: 700; color: var(--accent); margin: 16px 0; word-break: break-word; }
+  button { font: inherit; font-weight: 600; background: var(--accent); color: #fff; border: 0;
+           border-radius: 999px; padding: 14px 28px; cursor: pointer; }
+  button:focus-visible { outline: 3px solid #f1c40f; outline-offset: 3px; }
+  [hidden] { display: none; }
+</style>
+</head>
+<body>
+<main>
+  <div aria-hidden="true" style="font-size:56px">🎁</div>
+  <h1 id="hello">Secret Santa</h1>
+  <section id="ready" hidden>
+    <p>Make sure nobody is looking at your screen.</p>
+    <button id="show" type="button">Show who I'm buying for</button>
+  </section>
+  <section id="result" hidden aria-live="polite">
+    <p>You're buying a gift for</p>
+    <div class="match" id="match"></div>
+    <p>Shhh 🤫 keep it secret!</p>
+  </section>
+  <p id="broken" hidden>This link looks broken. Ask the organiser to send it again.</p>
+</main>
+<script>
+  // The link ends in #<base64 of {"g": giver, "r": receiver}>, made by secret_santa.py.
+  var $ = function (id) { return document.getElementById(id); };
+  try {
+    var b64 = location.hash.slice(1).replace(/-/g, "+").replace(/_/g, "/");
+    var bytes = Uint8Array.from(atob(b64), function (c) { return c.charCodeAt(0); });
+    var data = JSON.parse(new TextDecoder().decode(bytes));
+    if (!data.g || !data.r) throw new Error("missing names");
+    $("hello").textContent = "Hi " + data.g + "!";
+    $("match").textContent = data.r;
+    $("ready").hidden = false;
+    $("show").onclick = function () { $("ready").hidden = true; $("result").hidden = false; };
+  } catch (e) {
+    $("broken").hidden = false;
+  }
+</script>
+</body>
+</html>
