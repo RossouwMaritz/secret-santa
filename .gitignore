@@ -1,0 +1,4 @@
+# Real phone numbers and the secret draw stay local
+people.csv
+*.pairs.json
+__pycache__/
