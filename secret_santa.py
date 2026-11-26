@@ -59,7 +59,11 @@ def draw(names):
 
 def load_or_draw(people, pairs_path):
     if pairs_path.exists():
-        pairs = json.loads(pairs_path.read_text())
+        try:
+            pairs = json.loads(pairs_path.read_text())
+        except ValueError:
+            sys.exit(f"The saved draw in {pairs_path} is empty or damaged. Delete it to redraw "
+                     "(links already sent from the old draw will no longer match).")
         if set(pairs) != set(people):
             sys.exit(f"The people list changed since the draw. Delete {pairs_path} to redraw.")
         print(f"Using the saved draw in {pairs_path}\n")
